@@ -48,8 +48,8 @@
           </div>
 
           <!-- Receipt upload -->
-          <div class="mb-4">
-            <label class="form-label fw-semibold">Receipt</label>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Receipt (upload file)</label>
 
             {% if expense and expense['receipt'] %}
             <div class="mb-2 p-2 border rounded bg-white d-flex align-items-center gap-2">
@@ -69,6 +69,13 @@
             <div class="form-text">JPG, PNG, WEBP, or PDF — max 10 MB.
               {% if expense and expense['receipt'] %}Uploading a new file replaces the current one.{% endif %}
             </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Receipt URL <span class="text-muted fw-normal">(e.g. Google Drive link)</span></label>
+            <input type="url" name="receipt_url"
+                   value="{{ expense['receipt_url'] if expense and expense['receipt_url'] else '' }}"
+                   class="form-control" placeholder="https://drive.google.com/...">
           </div>
 
           <div class="d-flex gap-2">

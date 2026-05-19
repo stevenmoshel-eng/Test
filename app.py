@@ -19,13 +19,12 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "pdf", "webp"}
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
 
 CATEGORIES = [
-    "Food & Dining",
-    "Transport",
-    "Accommodation",
-    "Entertainment",
-    "Health",
-    "Shopping",
-    "Utilities",
+    "Client Meals & Entertainment",
+    "Travel",
+    "Technology & Software",
+    "Marketing & Prospecting",
+    "Education & Training",
+    "Mileage",
     "Other",
 ]
 
@@ -51,9 +50,14 @@ def init_db():
                 expense_date TEXT   NOT NULL,
                 notes       TEXT,
                 receipt     TEXT,
+                receipt_url TEXT,
                 created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
             )
         """)
+        # Migrate existing DB if receipt_url column is missing
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(expenses)").fetchall()]
+        if "receipt_url" not in cols:
+            conn.execute("ALTER TABLE expenses ADD COLUMN receipt_url TEXT")
 
 
 def allowed_file(filename: str) -> bool:
@@ -153,6 +157,7 @@ def add():
             errors.append("Date is required.")
 
         receipt_filename = None
+        receipt_url = request.form.get("receipt_url", "").strip() or None
         if "receipt" in request.files:
             f = request.files["receipt"]
             if f and f.filename:
@@ -169,9 +174,9 @@ def add():
 
         with get_db() as conn:
             conn.execute(
-                "INSERT INTO expenses (title, amount, category, expense_date, notes, receipt) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (title, amount, category, expense_date, notes, receipt_filename),
+                "INSERT INTO expenses (title, amount, category, expense_date, notes, receipt, receipt_url) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (title, amount, category, expense_date, notes, receipt_filename, receipt_url),
             )
         flash("Expense added.", "success")
         return redirect(url_for("index"))
@@ -210,10 +215,12 @@ def edit(expense_id: int):
             errors.append("Date is required.")
 
         new_receipt = expense["receipt"]
+        new_receipt_url = request.form.get("receipt_url", "").strip() or expense["receipt_url"]
 
         if remove_receipt:
             delete_receipt_file(expense["receipt"])
             new_receipt = None
+            new_receipt_url = None
 
         if "receipt" in request.files:
             f = request.files["receipt"]
@@ -232,8 +239,8 @@ def edit(expense_id: int):
         with get_db() as conn:
             conn.execute(
                 "UPDATE expenses SET title=?, amount=?, category=?, expense_date=?, "
-                "notes=?, receipt=? WHERE id=?",
-                (title, amount, category, expense_date, notes, new_receipt, expense_id),
+                "notes=?, receipt=?, receipt_url=? WHERE id=?",
+                (title, amount, category, expense_date, notes, new_receipt, new_receipt_url, expense_id),
             )
         flash("Expense updated.", "success")
         return redirect(url_for("index"))

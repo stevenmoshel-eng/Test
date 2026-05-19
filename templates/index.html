@@ -92,8 +92,13 @@
           <td class="text-center">
             {% if e['receipt'] %}
             <a href="{{ url_for('receipt', filename=e['receipt']) }}" target="_blank"
-               class="btn btn-sm btn-outline-info" title="View receipt">
+               class="btn btn-sm btn-outline-info" title="View uploaded receipt">
               <i class="bi bi-file-earmark-image"></i>
+            </a>
+            {% elif e['receipt_url'] %}
+            <a href="{{ e['receipt_url'] }}" target="_blank"
+               class="btn btn-sm btn-outline-info" title="View receipt (Google Drive)">
+              <i class="bi bi-cloud-arrow-up"></i>
             </a>
             {% else %}
             <span class="text-muted">—</span>
