@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Expense{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">
+        <i class="bi bi-{{ 'plus-circle' if action == 'Add' else 'pencil-square' }}"></i>
+        {{ action }} Expense
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+            <input type="text" name="title" value="{{ form.get('title', '') }}"
+                   class="form-control" placeholder="e.g. Lunch at Cafe Roma" required>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Amount ($) <span class="text-danger">*</span></label>
+              <input type="number" name="amount" value="{{ form.get('amount', '') }}"
+                     class="form-control" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+              <input type="date" name="expense_date" value="{{ form.get('expense_date', '') }}"
+                     class="form-control" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Category</label>
+            <select name="category" class="form-select">
+              {% for cat in categories %}
+              <option value="{{ cat }}"
+                {% if form.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Notes</label>
+            <textarea name="notes" class="form-control" rows="2"
+                      placeholder="Optional details">{{ form.get('notes', '') }}</textarea>
+          </div>
+
+          <!-- Receipt upload -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Receipt</label>
+
+            {% if expense and expense['receipt'] %}
+            <div class="mb-2 p-2 border rounded bg-white d-flex align-items-center gap-2">
+              <i class="bi bi-paperclip text-muted"></i>
+              <a href="{{ url_for('receipt', filename=expense['receipt']) }}" target="_blank"
+                 class="text-truncate small">View current receipt</a>
+              <div class="ms-auto form-check mb-0">
+                <input class="form-check-input" type="checkbox" name="remove_receipt"
+                       value="1" id="removeReceipt">
+                <label class="form-check-label small text-danger" for="removeReceipt">Remove</label>
+              </div>
+            </div>
+            {% endif %}
+
+            <input type="file" name="receipt" class="form-control"
+                   accept=".jpg,.jpeg,.png,.pdf,.webp">
+            <div class="form-text">JPG, PNG, WEBP, or PDF — max 10 MB.
+              {% if expense and expense['receipt'] %}Uploading a new file replaces the current one.{% endif %}
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg"></i> {{ action }} Expense
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

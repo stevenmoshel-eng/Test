@@ -1,0 +1,25 @@
+body {
+  min-height: 100vh;
+}
+
+.navbar-brand {
+  letter-spacing: .02em;
+}
+
+.badge-category {
+  font-size: .8rem;
+  color: #555;
+}
+
+.progress-bar {
+  background-color: #0d6efd;
+}
+
+.table > :not(caption) > * > * {
+  padding-top: .6rem;
+  padding-bottom: .6rem;
+}
+
+.card {
+  border: 1px solid #e3e6ea;
+}

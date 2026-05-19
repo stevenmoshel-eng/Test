@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}All Expenses{% endblock %}
+
+{% block content %}
+<!-- Summary cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-1">Total Spending</div>
+        <div class="fs-3 fw-bold text-primary">${{ "%.2f"|format(total) }}</div>
+        <div class="text-muted small">{{ expenses|length }} expense{{ 's' if expenses|length != 1 }}</div>
+      </div>
+    </div>
+  </div>
+  {% if by_category %}
+  <div class="col-sm-6 col-md-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small mb-2">By Category</div>
+        {% for row in by_category %}
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="badge-category">{{ row['category'] }}</span>
+          <span class="fw-semibold">${{ "%.2f"|format(row['subtotal']) }}</span>
+        </div>
+        <div class="progress mb-2" style="height:6px">
+          <div class="progress-bar" style="width:{{ (row['subtotal']/total*100)|int if total else 0 }}%"></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-sm-4">
+        <label class="form-label small fw-semibold">Category</label>
+        <select name="category" class="form-select form-select-sm">
+          <option value="">All categories</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if cat == category_filter %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <label class="form-label small fw-semibold">From</label>
+        <input type="date" name="date_from" value="{{ date_from }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-sm-3">
+        <label class="form-label small fw-semibold">To</label>
+        <input type="date" name="date_to" value="{{ date_to }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-sm-2 d-flex gap-1">
+        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Expense table -->
+{% if expenses %}
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Date</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th class="text-end">Amount</th>
+          <th class="text-center">Receipt</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in expenses %}
+        <tr>
+          <td class="text-nowrap text-muted small">{{ e['expense_date'] }}</td>
+          <td>
+            <span class="fw-semibold">{{ e['title'] }}</span>
+            {% if e['notes'] %}
+            <div class="text-muted small">{{ e['notes']|truncate(60) }}</div>
+            {% endif %}
+          </td>
+          <td><span class="badge bg-secondary-subtle text-secondary-emphasis">{{ e['category'] }}</span></td>
+          <td class="text-end fw-bold">${{ "%.2f"|format(e['amount']) }}</td>
+          <td class="text-center">
+            {% if e['receipt'] %}
+            <a href="{{ url_for('receipt', filename=e['receipt']) }}" target="_blank"
+               class="btn btn-sm btn-outline-info" title="View receipt">
+              <i class="bi bi-file-earmark-image"></i>
+            </a>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="text-end text-nowrap">
+            <a href="{{ url_for('edit', expense_id=e['id']) }}"
+               class="btn btn-sm btn-outline-secondary me-1">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <form method="post" action="{{ url_for('delete', expense_id=e['id']) }}"
+                  class="d-inline" onsubmit="return confirm('Delete this expense?')">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-inbox fs-1"></i>
+  <p class="mt-2">No expenses found. <a href="{{ url_for('add') }}">Add one!</a></p>
+</div>
+{% endif %}
+{% endblock %}
