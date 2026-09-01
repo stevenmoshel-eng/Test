@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="60">
+  <title>News Feed — Last 24 Hours</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Last 24 Hours</h1>
+    <p class="subtitle">{{ posts|length }} posts &middot; refreshes every minute</p>
+  </header>
+
+  <main>
+    {% if posts %}
+      {% for post in posts %}
+        <article class="post">
+          <div class="post-meta">
+            <span class="channel">{{ post.channel }}</span>
+            <span class="date">{{ post.date }}</span>
+          </div>
+          <p class="summary">{{ post.summary or "(summarizing...)" }}</p>
+          <details>
+            <summary>Original post</summary>
+            <p class="original">{{ post.text }}</p>
+          </details>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No posts yet. Make sure run_collector_loop.py is running.</p>
+    {% endif %}
+  </main>
+</body>
+</html>

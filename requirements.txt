@@ -1,0 +1,4 @@
+telethon
+anthropic
+flask
+python-dotenv

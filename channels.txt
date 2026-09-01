@@ -1,0 +1,4 @@
+# One Telegram channel username per line (the part after t.me/, no @).
+# Lines starting with # are ignored. Add or remove channels any time —
+# the collector picks up changes on its next fetch cycle.
+amitseg

@@ -1,0 +1,8 @@
+.env
+*.session
+*.session-journal
+posts.db
+__pycache__/
+*.pyc
+venv/
+israel-news-env/
